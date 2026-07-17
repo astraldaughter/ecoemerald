@@ -42,23 +42,6 @@ Route103_EventScript_RivalMay::
 	case 2, Route103_EventScript_StartMayBattleMudkip
 	end
 
-Route103_EventScript_RivalBrendan::
-	msgbox Route103_Text_BrendanRoute103Pokemon, MSGBOX_DEFAULT
-	closemessage
-	playbgm MUS_ENCOUNTER_BRENDAN, TRUE
-	applymovement LOCALID_ROUTE103_RIVAL, Common_Movement_FacePlayer
-	waitmovement 0
-	applymovement LOCALID_ROUTE103_RIVAL, Common_Movement_ExclamationMark
-	waitmovement 0
-	applymovement LOCALID_ROUTE103_RIVAL, Common_Movement_Delay48
-	waitmovement 0
-	msgbox Route103_Text_BrendanLetsBattle, MSGBOX_DEFAULT
-	switch VAR_STARTER_MON
-	case 0, Route103_EventScript_StartBrendanBattleTreecko
-	case 1, Route103_EventScript_StartBrendanBattleTorchic
-	case 2, Route103_EventScript_StartBrendanBattleMudkip
-	end
-
 Route103_EventScript_StartMayBattleTreecko::
 	trainerbattle_no_intro TRAINER_MAY_ROUTE_103_TREECKO, Route103_Text_MayDefeated
 	goto Route103_EventScript_AfterMayBattle
@@ -353,3 +336,37 @@ Route103_Text_RouteSign:
 	.string "{DOWN_ARROW} OLDALE TOWN$"
 
 `
+
+script Route103_EventScript_RivalBrendan {
+	msgbox(Route103_Text_BrendanRoute103Pokemon)
+	closemessage
+	playbgm(MUS_ENCOUNTER_BRENDAN, TRUE)
+	applymovement(LOCALID_ROUTE103_RIVAL, Common_Movement_FacePlayer)
+	waitmovement
+	applymovement(LOCALID_ROUTE103_RIVAL, Common_Movement_ExclamationMark)
+	waitmovement
+	applymovement(LOCALID_ROUTE103_RIVAL, Common_Movement_Delay48)
+	waitmovement
+	getpartysize
+	if (var(VAR_RESULT) == 6) {
+		msgbox("Hey, it's {PLAYER}!\p…Oh, yeah, Dad gave you a POKéMON.\pSince we're here, how about a little\nbattle?\p…You've already caught another five!?\nForget about the battle.\l…Man, you're something else, huh?\pI think I know why my dad has his eye\nout for you now.\pI mean, catching that many POKéMON on\nyour first day as a TRAINER?\p{PLAYER}, I get the feeling that you\ncould befriend any POKéMON with ease.\pWe should head back to the LAB.")
+		call(Route103_EventScript_RivalExit)
+	} elif (var(VAR_RESULT) > 1) {
+		msgbox(Route103_Text_BrendanLetsBattle)
+		switch (var(VAR_STARTER_MON)) {
+			case 0: call(Route103_EventScript_StartBrendanBattleTreecko)
+			case 1: call(Route103_EventScript_StartBrendanBattleTorchic)
+			case 2: call(Route103_EventScript_StartBrendanBattleMudkip)
+			end
+		}
+	} else {
+		msgbox("Hey, it's {PLAYER}!\p…Oh, yeah, Dad gave you a POKéMON.\pSince we're here, how about a little\nbattle?\p…Oh, you only have one POKéMON.\pYou might not know this, since you just\nmoved here, but battles are normally\l2-on-2 in the HOENN region.\pGo catch another, okay?")
+		if (checkitem(ITEM_POKE_BALL) == FALSE) {
+			msgbox("…You ran out of POKé BALLS?\nHere, have some of my spares.")
+			giveitem(ITEM_POKE_BALL, 5)
+		}
+		fadedefaultbgm
+		release
+		end
+	}
+}
